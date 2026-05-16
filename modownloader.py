@@ -11,31 +11,24 @@ from tkinter.scrolledtext import ScrolledText
 # CONFIG
 # ----------------------------
 
-root = tk.Tk()
-
 # Custom font
-APP_FONT = "Mojangles"
+APP_FONT = "Minecrafter"
 # ----------------------------
 MODRINTH_API = "https://api.modrinth.com/v2"
 
+# Default Minecraft mods folder
 MINECRAFT_MODS_FOLDER = os.path.join(
-    os.getenv("APPDATA"),
-    ".minecraft",
-    "mods"
+    os.getenv("APPDATA"), ".minecraft", "versions"
 )
 
-current_mods_folder = str(MINECRAFT_MODS_FOLDER)
+current_mods_folder = MINECRAFT_MODS_FOLDER
 
-# Window title
+# ----------------------------
+# MAIN WINDOW
+# ----------------------------
+root = tk.Tk()
 root.title("Modownloader")
-
-# Set icon
-icon_path = os.path.join(os.path.dirname(__file__), "logo.ico")
-
-if os.path.exists(icon_path):
-    root.iconbitmap(icon_path)
-else:
-    print("Icon not found:", icon_path)
+root.configure(bg="#222b22")
 
 # Screen setup
 screen_width = root.winfo_screenwidth()
@@ -45,7 +38,11 @@ root.geometry(f"{screen_width}x{screen_height}+0+0")
 root.state("zoomed")
 root.minsize(1000, 700)
 
-root.configure(bg="#222b22")
+icon_path = os.path.join(os.path.dirname(__file__), "logo.ico")
+if os.path.exists(icon_path):
+    root.iconbitmap(icon_path)
+else:
+    print("Icon not found:", icon_path)
 
 style = ttk.Style()
 style.theme_use("clam")
@@ -58,12 +55,11 @@ mod_icons = {}
 versions_data = []
 selected_project_id = None
 
-# ----------------------------
+
 # FUNCTIONS
-# ----------------------------
 def log(text):
     console.configure(state="normal")
-    console.insert(tk.END, text + "\n")
+    console.insert(tk.END, str(text) + "\n")
     console.see(tk.END)
     console.configure(state="disabled")
 
@@ -78,6 +74,34 @@ def load_mod_icon(url):
         return None
 
 
+def get_current_project_type():
+    project_type = content_type_var.get()
+
+    if project_type == "mod":
+        mods_label.config(text="Mods")
+        install_button.config(text="Download & Install Mod")
+
+    elif project_type == "resourcepack":
+        mods_label.config(text="Resource Packs")
+        install_button.config(text="Download & Install Resource Pack")
+
+    else:
+        mods_label.config(text="Shaderpacks")
+        install_button.config(text="Download & Install Shaderpack")
+
+    return project_type
+
+
+
+    current_tab = notebook.tab(notebook.select(), "text")
+
+    if current_tab == "Mods":
+        return "mod"
+    elif current_tab == "Resource Packs":
+        return "resourcepack"
+    return "shader"
+
+
 def search_mods():
     global mods_data
 
@@ -88,7 +112,6 @@ def search_mods():
 
     for widget in mods_inner_frame.winfo_children():
         widget.destroy()
-
     mods_listbox.delete(0, tk.END)
     versions_listbox.delete(0, tk.END)
 
@@ -100,7 +123,7 @@ def search_mods():
             params={
                 "query": query,
                 "limit": 25,
-                "facets": '[ ["project_type:mod"] ]'
+                "facets": f'[["project_type:{get_current_project_type()}\"]]'
             }
         )
 
@@ -138,7 +161,7 @@ def search_mods():
             title_label = tk.Label(
                 info,
                 text=title,
-                font=(APP_FONT, 12, "bold"),
+                font=("Minecraft", 12, "bold"),
                 bg="#2a2a2a",
                 fg="white",
                 anchor="w"
@@ -328,14 +351,6 @@ def open_mods_folder():
 # ----------------------------
 # UI
 # ----------------------------
-header = tk.Label(
-    root,
-    text="MODOWNLOADER - Modrinth Minecraft Mod Downloader",
-    bg="#1e1e1e",
-    fg="#96e2a9",
-    font=("Minecrafter", 20, "bold")
-)
-header.pack(pady=10)
 
 search_frame = tk.Frame(root, bg="#1e1e1e")
 search_frame.pack(fill="x", padx=10)
@@ -346,45 +361,49 @@ version_var = tk.StringVar()
 search_entry = tk.Entry(
     search_frame,
     textvariable=search_var,
-    font=("Minecrafter", 12),
+    font=("Mojangles", 12),
     width=35,
     bg="#2b2b2b",
     fg="white",
     insertbackground="white"
 )
-search_entry.grid(row=0, column=0, padx=5, pady=5)
+search_entry.grid(row=1, column=0, padx=5, pady=20)
 
 version_entry = tk.Entry(
     search_frame,
     textvariable=version_var,
-    font=("Minecrafter", 12),
+    font=("Mojangles", 12),
     width=15,
     bg="#2b2b2b",
     fg="white",
     insertbackground="white"
 )
-version_entry.grid(row=0, column=1, padx=5)
-version_entry.insert(0, "1.20.1")
+version_entry.grid(row=1, column=1, padx=5)
+version_entry.insert(0, "1.21.11")
 
 search_button = tk.Button(
     search_frame,
-    text="Search Mods",
+    text="Search",
     command=search_mods,
     bg="#00aa55",
     fg="white",
-    font=("Minecrafter", 11, "bold")
+    font=("Minecrafter", 16)
 )
-search_button.grid(row=0, column=2, padx=5)
+search_button.grid(row=1, column=2, padx=5)
+
+search_after_id = None
+
+search_entry.bind("<KeyRelease>")
 
 folder_button = tk.Button(
     search_frame,
     text="Open Mods Folder",
     command=open_mods_folder,
-    bg="#4444aa",
+    bg="#00aa55",
     fg="white",
-    font=("Minecrafter", 11, "bold")
+    font=("Minecrafter", 16)
 )
-folder_button.grid(row=0, column=3, padx=5)
+folder_button.grid(row=1, column=3, padx=5)
 
 change_folder_button = tk.Button(
     search_frame,
@@ -392,19 +411,78 @@ change_folder_button = tk.Button(
     command=change_mods_folder,
     bg="#666666",
     fg="white",
-    font=("Minecrafter", 11, "bold")
+    font=("Minecrafter", 16)
 )
-change_folder_button.grid(row=0, column=4, padx=5)
+change_folder_button.grid(row=1, column=4, padx=5)
 
 folder_path_label = tk.Label(
     root,
-    text=current_mods_folder,
+    text="  " + current_mods_folder,
     bg="#1e1e1e",
-    fg="#ffffff",
-    font=("Mojangles", 9),
+    fg="#00ff88",
+    font=("Minecraft", 9),
     anchor="w"
 )
-folder_path_label.pack(fill="x", padx=12, pady=(0, 5))
+folder_path_label.pack(fill="x", padx=10, pady=(0, 5))
+
+# ----------------------------
+# CONTENT TYPE SELECTOR
+# ----------------------------
+content_type_var = tk.StringVar(value="mod")
+
+content_type_frame = tk.Frame(root, bg="#1e1e1e")
+content_type_frame.pack(fill="x", padx=10, pady=(0, 8))
+
+content_label = tk.Label(
+    content_type_frame,
+    text="Content Type:",
+    bg="#1e1e1e",
+    fg="white",
+    font=(APP_FONT, 11)
+)
+content_label.pack(side="left", padx=(0, 10))
+
+mods_radio = tk.Radiobutton(
+    content_type_frame,
+    text="Mods",
+    variable=content_type_var,
+    value="mod",
+    bg="#1e1e1e",
+    fg="#aff1d0",
+    selectcolor="#aff1d0",
+    activebackground="#1e1e1e",
+    activeforeground="white",
+    font=(APP_FONT, 10)
+)
+mods_radio.pack(side="left", padx=5)
+
+resourcepacks_radio = tk.Radiobutton(
+    content_type_frame,
+    text="Resource Packs",
+    variable=content_type_var,
+    value="resourcepack",
+    bg="#1e1e1e",
+    fg="#aff1d0",
+    selectcolor="#aff1d0",
+    activebackground="#1e1e1e",
+    activeforeground="white",
+    font=(APP_FONT, 10)
+)
+resourcepacks_radio.pack(side="left", padx=5)
+
+shaderpacks_radio = tk.Radiobutton(
+    content_type_frame,
+    text="Shaderpacks",
+    variable=content_type_var,
+    value="shader",
+    bg="#1e1e1e",
+    fg="#aff1d0",
+    selectcolor="#aff1d0",
+    activebackground="#1e1e1e",
+    activeforeground="white",
+    font=(APP_FONT, 10)
+)
+shaderpacks_radio.pack(side="left", padx=5)
 
 lists_frame = tk.Frame(root, bg="#1e1e1e")
 lists_frame.pack(fill="both", expand=True, padx=10, pady=10)
@@ -418,7 +496,7 @@ mods_label = tk.Label(
     text="Mods",
     bg="#1e1e1e",
     fg="white",
-    font=("Minecrafter", 14)
+    font=("Minecraft", 14, "bold")
 )
 mods_label.pack(fill="x", pady=5)
 
@@ -471,7 +549,7 @@ versions_label = tk.Label(
     text="Versions",
     bg="#1e1e1e",
     fg="white",
-    font=("Minecrafter", 14, "bold")
+    font=("Minecraft", 14, "bold")
 )
 versions_label.pack()
 
