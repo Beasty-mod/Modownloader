@@ -11,8 +11,8 @@ It is an open-source application, used for downloading mods automatically into y
    - **Step 1** = Specify your mods folder
    - **Step 2** = Search and download a specific version of a mod that you want.
   
-<img width="730" height="35" alt="image" src="https://github.com/user-attachments/assets/22a432ec-6b44-42d2-89ba-60fd37480347" />
-<img width="1352" height="445" alt="image" src="https://github.com/user-attachments/assets/de2b6e8a-d775-4729-91e9-12f9eafeacba" /> 
+<img width="697" height="98" alt="image" src="https://github.com/user-attachments/assets/f1ffeb4a-76de-4206-a48f-9c9e6b74f4fe" />
+<img width="1356" height="505" alt="image" src="https://github.com/user-attachments/assets/fd755ade-41f4-42ff-8320-d685440def38" />
 
 ## How You Can Help:
   - Report bugs and issues
