@@ -1,6 +1,6 @@
 # Modownloader
 
-It is an open-source application, used for downloading mods automatically into you mods folder of Minecraft,
+It is an application (source -available), used for downloading mods automatically into you mods folder of Minecraft,
 
 ## To get started:
   - **Step 1** = Download the latest release
